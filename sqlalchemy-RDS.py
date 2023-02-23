@@ -22,8 +22,8 @@ steam_path = 'data/steam.csv'
 tags_path = 'data/tags.csv'
 
 # Read in csv files
-steam = pd.read_csv(steam_path)
-tags = pd.read_csv(tags_path)
+steam = pd.read_csv(steam_path).set_index('title')
+tags = pd.read_csv(tags_path, names= ['id', 'genre']).set_index('id')
 
 # Drop existing table if needed
 connection = engine.raw_connection()
