@@ -16,22 +16,22 @@ row_dict = {}
 outside_array = []
 
 # scroll to bottom (uncomment block when running, it will take approx 45 min)
-# last_height = driver.execute_script("return document.body.scrollHeight")
-# while True:
-#     # Scroll down to the bottom.
-#     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+last_height = driver.execute_script("return document.body.scrollHeight")
+while True:
+    # Scroll down to the bottom.
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-#     # Wait to load the page.
-#     time.sleep(1.5)
+    # Wait to load the page.
+    time.sleep(1.5)
 
-#     # Calculate new scroll height and compare with last scroll height.
-#     new_height = driver.execute_script("return document.body.scrollHeight")
+    # Calculate new scroll height and compare with last scroll height.
+    new_height = driver.execute_script("return document.body.scrollHeight")
 
-#     if new_height == last_height:
+    if new_height == last_height:
 
-#         break
+        break
 
-#     last_height = new_height
+    last_height = new_height
 
 for row in element.find_elements(By.CSS_SELECTOR, 'a'):
     inside_array = []
@@ -39,7 +39,7 @@ for row in element.find_elements(By.CSS_SELECTOR, 'a'):
     inside_array.append(row.get_attribute('href'))
     inside_array.append(row.find_element(By.CLASS_NAME, 'title').get_attribute('innerHTML'))
     inside_array.append(row.get_attribute('data-ds-tagids'))
-    # inside_array.append(row.find_element(By.CLASS_NAME, ''))
+
     if len(row.find_elements(By.CLASS_NAME, 'win')) > 0:
         inside_array.append("windows")
     else:
@@ -72,8 +72,8 @@ for row in element.find_elements(By.CSS_SELECTOR, 'a'):
     inside_array.append(row.find_element(By.CLASS_NAME, 'search_price').get_attribute('innerHTML').split('$')[-1].strip())
     outside_array.append(inside_array)
 
-print(outside_array)
+# print(outside_array)
 
 # uncomment to create csv file
-# pd.DataFrame(outside_array, columns = ['title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
-#                                       'total_review', 'date_released','discount', 'price' ]).to_csv('../data/steam.csv', index=False)
+pd.DataFrame(outside_array, columns = ['Unique_ID','url','title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
+                                      'total_review', 'date_released','discount', 'price' ]).to_csv('data/steam.csv', index=False)
