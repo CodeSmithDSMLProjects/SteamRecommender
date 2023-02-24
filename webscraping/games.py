@@ -6,6 +6,7 @@ import re
 import time
 import numpy as np
 import pandas as pd
+import json
 
 from sqlalchemy import URL, create_engine
 
@@ -27,20 +28,24 @@ def update_games():
     SELECT * FROM steam
     """
 
+    sql_tag = """
+    SELECT * FROM tags
+    """
+
     games_df = pd.read_sql(sql, con=connection)
-
-
+    tags_df = pd.read_sql(sql_tag, con=connection, index_col='id')
+    tag_dict = tags_df.to_dict()
 
     # Grab data from datatable / csv
     # games_df = pd.read_csv('../data/steam.csv')
     unique_id_list = games_df['Unique_ID'].to_numpy()
-
 
     service = Service('/users/paulj/chromedriver')
     driver = webdriver.Chrome(service=service)
     driver.get("https://store.steampowered.com/search/?sort_by=Released_DESC&filter=topsellers&supportedlang=english")
 
     element = driver.find_element(By.ID, 'search_resultsRows')
+    row_dict = {}
     outside_array = []
 
     # scroll to bottom
@@ -56,9 +61,7 @@ def update_games():
         new_height = driver.execute_script("return document.body.scrollHeight")
 
         if new_height == last_height:
-
             break
-
         last_height = new_height
 
     for row in element.find_elements(By.CSS_SELECTOR, 'a'):
@@ -66,15 +69,24 @@ def update_games():
 
         unique_id = np.int64(row.get_attribute('data-ds-appid'))
 
-
         # conditional to see if new game
         if unique_id not in unique_id_list:
-
+        # using this to get brand new data
+        # if True:
             inside_array.append(row.get_attribute('data-ds-appid'))
             inside_array.append(row.get_attribute('href'))
             inside_array.append(row.find_element(By.CLASS_NAME, 'title').get_attribute('innerHTML'))
-            inside_array.append(row.get_attribute('data-ds-tagids'))
-            # inside_array.append(row.find_element(By.CLASS_NAME, ''))
+
+            temp =row.get_attribute('data-ds-tagids')
+            if temp is not None:
+                new_tags = json.loads(temp)
+                list_genre = []
+                for tag in new_tags:
+                    list_genre.append(tag_dict['genre'][int(tag)])
+                inside_array.append(list_genre)
+            else:
+                inside_array.append('None Listed')
+
             if len(row.find_elements(By.CLASS_NAME, 'win')) > 0:
                 inside_array.append(1)
             else:
@@ -107,14 +119,16 @@ def update_games():
             inside_array.append(row.find_element(By.CLASS_NAME, 'search_price').get_attribute('innerHTML').split('$')[-1].strip())
             
         else:
-
-            inside_array = games_df.loc[games_df['Unique_ID'] == 1643320].values.flatten().tolist()
+            inside_array = games_df.loc[games_df['Unique_ID'] == unique_id].values.flatten().tolist()
         
         outside_array.append(inside_array)
 
-
-    # print(outside_array)
-
     # uncomment to create csv file
-    return(pd.DataFrame(outside_array, columns = ['Unique_ID','url','title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
-                                        'total_review', 'date_released','discount', 'price' ]))
+    # pd.DataFrame(outside_array, columns = ['Unique_ID','url','title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
+    #                                     'total_review', 'date_released','discount', 'price' ]).to_csv('data/steam.csv', index=False)
+
+    # save to sql
+    games = pd.DataFrame(outside_array, columns = ['Unique_ID','url','title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
+                                        'total_review', 'date_released','discount', 'price' ])
+
+    games.to_sql(name='steam', con=engine, if_exists='replace')
