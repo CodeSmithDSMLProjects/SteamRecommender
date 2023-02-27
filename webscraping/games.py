@@ -1,24 +1,27 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 import re
 import time
 import numpy as np
 import pandas as pd
 import json
+import os
 
 from sqlalchemy import URL, create_engine
+
 
 def update_games():
 
     url_object = URL.create(
                     "postgresql+psycopg2",
-                    host='steam-db.c5m99euxia00.us-east-1.rds.amazonaws.com',
-                    username='myuser',
+                    host=os.environ["HOST"],
+                    username=os.environ["USER"],
                     port=5432,
-                    password='secret_passwd',
-                    database='steam_db')
+                    password=os.environ["PASSWORD"],
+                    database=os.environ["DB"])
 
     engine = create_engine(url_object)
     engine.connect()
@@ -40,12 +43,18 @@ def update_games():
     # games_df = pd.read_csv('../data/steam.csv')
     unique_id_list = games_df['Unique_ID'].to_numpy()
 
-    service = Service('/users/paulj/chromedriver')
-    driver = webdriver.Chrome(service=service)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
+
+    service = Service('/usr/local/bin/chromedriver')
+    driver = webdriver.Chrome(service=service, options = chrome_options)
     driver.get("https://store.steampowered.com/search/?sort_by=Released_DESC&filter=topsellers&supportedlang=english")
 
     element = driver.find_element(By.ID, 'search_resultsRows')
-    row_dict = {}
+    # row_dict = {}
     outside_array = []
 
     # scroll to bottom
@@ -63,10 +72,11 @@ def update_games():
         if new_height == last_height:
             break
         last_height = new_height
-
+    i = 0 
     for row in element.find_elements(By.CSS_SELECTOR, 'a'):
         inside_array = []
-
+        print("scrape row" + str(i))
+        i = i + 1
         unique_id = np.int64(row.get_attribute('data-ds-appid'))
 
         # conditional to see if new game
@@ -119,16 +129,14 @@ def update_games():
             inside_array.append(row.find_element(By.CLASS_NAME, 'search_price').get_attribute('innerHTML').split('$')[-1].strip())
             
         else:
-            inside_array = games_df.loc[games_df['Unique_ID'] == unique_id].values.flatten().tolist()
+            inside_array = games_df.loc[games_df['Unique_ID'] == unique_id].values[0].flatten().tolist()
         
         outside_array.append(inside_array)
 
     # uncomment to create csv file
-    # pd.DataFrame(outside_array, columns = ['Unique_ID','url','title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
-    #                                     'total_review', 'date_released','discount', 'price' ]).to_csv('data/steam.csv', index=False)
-
-    # save to sql
     games = pd.DataFrame(outside_array, columns = ['Unique_ID','url','title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
                                         'total_review', 'date_released','discount', 'price' ])
 
-    games.to_sql(name='steam', con=engine, if_exists='replace')
+    return (games.to_sql(name='steam', con=engine, if_exists='replace'))
+
+update_games()

@@ -1,5 +1,7 @@
-# AWS Keys
+# Keys
 keys.py
+steamkey.py
+envs.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -78,6 +80,9 @@ docs/_build/
 target/
 
 # Jupyter Notebook
+RDS Access.ipynb
+Guide to create new roles for postgres RDS connection.ipynb
+sqlalchemy - RDS Access.ipynb
 .ipynb_checkpoints
 
 # IPython
