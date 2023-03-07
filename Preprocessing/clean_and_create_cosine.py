@@ -1,4 +1,5 @@
-# grab webscraped data, clean the data into sparse dataframe, run cosine similarity, then push cosin similarity to rds
+# grab webscraped data, clean the data into sparse dataframe, run cosine similarity, 
+# then push cosine similarity to rds
 
 import pandas as pd
 import datetime as dt
