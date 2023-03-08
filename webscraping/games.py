@@ -80,7 +80,7 @@ def update_games():
         print("scrape row" + str(i))
         i = i + 1
         unique_id = np.int64(row.get_attribute('data-ds-appid'))
-
+        totalFinds = row.get_attribute('')
         # conditional to see if new game
         if unique_id not in unique_id_list:
         
@@ -132,7 +132,7 @@ def update_games():
         inside_array.append(row.find_element(By.CLASS_NAME, 'search_price').get_attribute('innerHTML').split('$')[-1].strip())
             
     else:
-        inside_array = games_df.loc[games_df['Unique_ID'] == unique_id].values[0].flatten().tolist()
+        inside_array = games_df.loc[games_df['Unique_ID'] == unique_id].values.flatten().tolist()
         
     outside_array.append(inside_array)
 
