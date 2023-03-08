@@ -66,6 +66,7 @@ def update_games():
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         # Wait to load the page.
+        # Changing time to 3s to try and bypass script timeout on EC2
         time.sleep(1.5)
 
         # Calculate new scroll height and compare with last scroll height.
