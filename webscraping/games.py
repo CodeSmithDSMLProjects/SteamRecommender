@@ -1,9 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-# from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.options import Options
 
-# from keys import secrets
 import re
 import time
 import numpy as np
@@ -17,13 +16,6 @@ from sqlalchemy import URL, create_engine
 
 def update_games():
 
-    # url_object = URL.create(
-    #                 "postgresql+psycopg2",
-    #                 host='steam-db.c5m99euxia00.us-east-1.rds.amazonaws.com',
-    #                 username=secrets.get('user'),
-    #                 port=5432,
-    #                 password=secrets.get('password'),
-    #                 database='steam_db')
     # Pull env variables
     url_object = URL.create(
                     "postgresql+psycopg2",
@@ -49,20 +41,19 @@ def update_games():
     tags_df = pd.read_sql(sql_tag, con=connection, index_col='id')
     tag_dict = tags_df.to_dict()
 
-    # Grab data from datatable / csv
-    # games_df = pd.read_csv('../data/steam.csv')
+    # Grab data from datatable 
     unique_id_list = games_df['Unique_ID'].to_numpy()
 
-    # chrome_options = Options()
-    # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--no-sandbox")
-    # chrome_options.add_argument("--disable-dev-shm-usage")
-
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
 
     service = Service('/usr/local/bin/chromedriver')
-    driver = webdriver.Chrome(service=service)
+    # driver = webdriver.Chrome(service=service)
 
-    # driver = webdriver.Chrome(service=service, options = chrome_options)
+    # Call in options settings to run chromedriver without window
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get("https://store.steampowered.com/search/?sort_by=Released_DESC&filter=topsellers&supportedlang=english")
 
     element = driver.find_element(By.ID, 'search_resultsRows')
@@ -84,7 +75,7 @@ def update_games():
         if new_height == last_height:
             break
         last_height = new_height
-    i = 0 
+    i = 0
     for row in tqdm(element.find_elements(By.CSS_SELECTOR, 'a')):
         inside_array = []
         print("scrape row" + str(i))
