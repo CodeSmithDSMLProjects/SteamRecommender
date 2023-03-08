@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import json
 import os
-import tqdm
 
 from sqlalchemy import URL, create_engine
 
@@ -75,10 +74,11 @@ def update_games():
         if new_height == last_height:
             break
         last_height = new_height
-
-    for row in tqdm(element.find_elements(By.CSS_SELECTOR, 'a')):
+    i = 0
+    for row in element.find_elements(By.CSS_SELECTOR, 'a'):
         inside_array = []
-
+        print("scrape row" + str(i))
+        i = i + 1
         unique_id = np.int64(row.get_attribute('data-ds-appid'))
 
         # conditional to see if new game
