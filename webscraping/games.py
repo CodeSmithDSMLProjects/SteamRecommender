@@ -75,11 +75,10 @@ def update_games():
         if new_height == last_height:
             break
         last_height = new_height
-    i = 0
+
     for row in tqdm(element.find_elements(By.CSS_SELECTOR, 'a')):
         inside_array = []
-        print("scrape row" + str(i))
-        i = i + 1
+
         unique_id = np.int64(row.get_attribute('data-ds-appid'))
 
         # conditional to see if new game
@@ -91,7 +90,7 @@ def update_games():
             inside_array.append(row.get_attribute('href'))
             inside_array.append(row.find_element(By.CLASS_NAME, 'title').get_attribute('innerHTML'))
 
-        temp =row.get_attribute('data-ds-tagids')
+        temp = row.get_attribute('data-ds-tagids')
         if temp is not None:
             new_tags = json.loads(temp)
             list_genre = []
@@ -132,14 +131,14 @@ def update_games():
             inside_array.append("No Discount")
         inside_array.append(row.find_element(By.CLASS_NAME, 'search_price').get_attribute('innerHTML').split('$')[-1].strip())
             
-        # else:
-        #     inside_array = games_df.loc[games_df['Unique_ID'] == unique_id].values[0].flatten().tolist()
+    else:
+        inside_array = games_df.loc[games_df['Unique_ID'] == unique_id].values[0].flatten().tolist()
         
-        outside_array.append(inside_array)
+    outside_array.append(inside_array)
 
     # uncomment to create csv file
-    games = pd.DataFrame(outside_array, columns = ['Unique_ID','url','title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
-                                        'total_review', 'date_released','discount', 'price' ])
+    games = pd.DataFrame(outside_array, columns=['Unique_ID', 'url', 'title', 'tags', 'win_comp','mac_comp','linux_comp','review','percent_review',
+                                                 'total_review', 'date_released', 'discount', 'price'])
 
     games.to_sql(name='steam', con=engine, if_exists='replace')
 
