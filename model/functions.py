@@ -2,7 +2,7 @@ import pandas as pd
 import pickle
 import boto3
 from botocore.exceptions import ClientError
-from keys import aws_keys
+import os
 
 # Read pkl file from S3
 def load_file(file_name, bucket):
@@ -17,9 +17,13 @@ def load_file(file_name, bucket):
     """
     # Need to change boto3 login
     # sess = boto3.Session()
+    # sess = boto3.Session(
+    #     aws_access_key_id = aws_keys.get('aws_access_key_id'),
+    #     aws_secret_access_key= aws_keys.get('aws_secret_access_key')
+    # )
     sess = boto3.Session(
-        aws_access_key_id = aws_keys.get('aws_access_key_id'),
-        aws_secret_access_key= aws_keys.get('aws_secret_access_key')
+        aws_access_key_id = os.environ["ACCESS_KEY"],
+        aws_secret_access_key= os.environ["SECRET_KEY"]
     )
     s3client = sess.client('s3')
 
