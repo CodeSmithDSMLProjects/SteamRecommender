@@ -17,40 +17,41 @@ from sqlalchemy import URL, create_engine
 
 def update_games():
 
-    url_object = URL.create(
-                    "postgresql+psycopg2",
-                    host = 'steam-db.c5m99euxia00.us-east-1.rds.amazonaws.com',
-                    username = secrets.get('user'),
-                    port=5432,
-                    password = secrets.get('password'),
-                    database='steam_db')
     # url_object = URL.create(
     #                 "postgresql+psycopg2",
-    #                 host=os.environ["HOST"],
-    #                 username=os.environ["USER"],
+    #                 host='steam-db.c5m99euxia00.us-east-1.rds.amazonaws.com',
+    #                 username=secrets.get('user'),
     #                 port=5432,
-    #                 password=os.environ["PASSWORD"],
-    #                 database=os.environ["DB"])
+    #                 password=secrets.get('password'),
+    #                 database='steam_db')
+    # Pull env variables
+    url_object = URL.create(
+                    "postgresql+psycopg2",
+                    host=os.environ["HOST"],
+                    username=os.environ["USER"],
+                    port=5432,
+                    password=os.environ["PASSWORD"],
+                    database=os.environ["DB"])
 
     engine = create_engine(url_object)
     engine.connect()
     connection = engine.raw_connection()
 
-    # sql = """
-    # SELECT * FROM steam
-    # """
+    sql = """
+    SELECT * FROM steam
+    """
 
     sql_tag = """
     SELECT * FROM tags
     """
 
-    # games_df = pd.read_sql(sql, con=connection)
+    games_df = pd.read_sql(sql, con=connection)
     tags_df = pd.read_sql(sql_tag, con=connection, index_col='id')
     tag_dict = tags_df.to_dict()
 
     # Grab data from datatable / csv
     # games_df = pd.read_csv('../data/steam.csv')
-    # unique_id_list = games_df['Unique_ID'].to_numpy()
+    unique_id_list = games_df['Unique_ID'].to_numpy()
 
     # chrome_options = Options()
     # chrome_options.add_argument("--headless")
@@ -91,13 +92,13 @@ def update_games():
         unique_id = np.int64(row.get_attribute('data-ds-appid'))
 
         # conditional to see if new game
-        # if unique_id not in unique_id_list:
+        if unique_id not in unique_id_list:
         
         # using this to get brand new data
         # if True:
-        inside_array.append(row.get_attribute('data-ds-appid'))
-        inside_array.append(row.get_attribute('href'))
-        inside_array.append(row.find_element(By.CLASS_NAME, 'title').get_attribute('innerHTML'))
+            inside_array.append(row.get_attribute('data-ds-appid'))
+            inside_array.append(row.get_attribute('href'))
+            inside_array.append(row.find_element(By.CLASS_NAME, 'title').get_attribute('innerHTML'))
 
         temp =row.get_attribute('data-ds-tagids')
         if temp is not None:
