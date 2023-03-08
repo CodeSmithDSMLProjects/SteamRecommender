@@ -1,10 +1,8 @@
 import pandas as pd
 import pickle
 import boto3
-import io
 from botocore.exceptions import ClientError
-import os
-
+from keys import aws_keys
 
 # Read pkl file from S3
 def load_file(file_name, bucket):
@@ -17,9 +15,14 @@ def load_file(file_name, bucket):
     Returns:
         _type_: _description_
     """
-
-    sess = boto3.Session()
+    # Need to change boto3 login
+    # sess = boto3.Session()
+    sess = boto3.Session(
+        aws_access_key_id = aws_keys.get('aws_access_key_id'),
+        aws_secret_access_key= aws_keys.get('aws_secret_access_key')
+    )
     s3client = sess.client('s3')
+
     try:
         response = s3client.get_object(Bucket=bucket, Key=file_name)
         body = response['Body'].read()
@@ -43,7 +46,11 @@ def topGames(id, df, max=10):
     """
 
     # Create ID-Title Dictionary
-    data = pd.read_csv('../data/steam.csv')
+    # Read from within dockerfile
+    # Substitute for sql datatable
+    data = pd.read_csv('steam.csv')
+
+    # data = pd.read_csv('../data/steam.csv')
     idNamesDict = data.set_index('Unique_ID').to_dict()['title']
 
     # Get top matches
