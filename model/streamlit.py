@@ -38,7 +38,7 @@ selected_navbar = option_menu(None, ["Predict", "FAQ", "API"], orientation="hori
 
 if selected_navbar == "Predict":
     with st.container():
-        st.text('TEXT FOR PICKING GAMES')
+        st.text('Steam has a wide range of games for everyone. With this, we have developed a game recommender model to help you decide which game to play next.\nSearching through the top sellers on Steam one can get lost with the sheer amount of games (i.e. OVER 9000).\nWith this recommender all you need to do is input a game that you have enjoyed recently and we will provide you with 10 games that are similar that you might enjoy!')
         form = st.form(key='uinput')
     with form:
 
@@ -51,10 +51,33 @@ if selected_navbar == "Predict":
 
     if button:
         # Connect to Flask Predict
-        url     =  'http://127.0.0.1:8080/predict'
+        url     =  'http://127.0.0.1:8080/predict_streamlit'
         payload = json.dumps(option)
         resp    = rq.post(url, json = payload)
         try:    
             st.write(pd.DataFrame(resp.json()))
         except Exception as e:
             st.text(f"Could not process request because: {e}")
+
+if selected_navbar == "API":
+    st.subheader("Our API is free to use and available via a POST request to (fill in later with url)")
+    st.write('The post request must include the title of the game')
+
+    st.subheader('Ex:')
+    st.text('''curl -d "S.T.A.L.K.E.R. 2: Heart of Chornobyl" -X POST url/predict''')
+       
+if selected_navbar == "FAQ":
+    with st.container():
+        with st.expander("What is Steam?"):
+            st.write('Steam is a digital platfor created by Valve Corportation to serve as a distributor of PC games')
+        with st.expander("What model is being used to predict similarity in games?"):
+            st.write('We are using a SVD truncated cosine similarity to find the most similar games')
+        with st.expander("How was the data collected?"):
+            st.write('All of the data has been gathered through web scraping steams database of top selling games')
+        with st.expander("Can I use this site commercially?"):
+            st.write('This site is not intended to be used commercially and should not be used commercially')
+
+
+
+st.write("Developed by Kevin Lam and Paul Yim [Github Repo]('https://github.com/CodeSmithDSMLProjects/SteamRecommender')")
+st.write("Contact us at ")

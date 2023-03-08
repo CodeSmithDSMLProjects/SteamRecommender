@@ -40,13 +40,11 @@ unpickled = pd.read_pickle("../data/cos_df.pkl")
 
 app = Flask(__name__)
 
-@app.route('/', methods = ['GET'])
-def view():
-    return 'Hello World!'
+@app.route('/')
 
 
-@app.route('/predict', methods = ['POST'])
-def predict():
+@app.route('/predict_streamlit', methods = ['POST'])
+def predict_streamlit():
 
     data = request.json
     pred = topGames(idDict[data[1:-1]], unpickled, 10)
@@ -54,6 +52,26 @@ def predict():
     load = json.loads(res)
     return json.dumps(load)
     # return json.dumps(pred)
+
+@app.route('/get_titles', methods = ['GET'])
+def get_games():
+
+    data = df['title']
+    res = data.to_json()
+    load = json.loads(res)
+    return json.dumps(load)
+
+@app.route('/predict', methods = ['POST'])
+def predict():
+
+
+    data = request.get_data()
+    data = data.decode("utf-8")
+    # data = json.loads(data)
+    pred = topGames(idDict[data], unpickled, 10)
+    res = pred.to_json()
+    load = json.loads(res)
+    return json.dumps(load)
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = 8080)
