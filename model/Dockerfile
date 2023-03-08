@@ -6,8 +6,6 @@ COPY functions.py .
 
 COPY requirements.txt .
 
-COPY keys.py .
-
 COPY steam.csv .
 
 RUN pip install --upgrade pip
