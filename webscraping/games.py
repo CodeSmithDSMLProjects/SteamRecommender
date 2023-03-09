@@ -65,9 +65,11 @@ def update_games():
         # Scroll down to the bottom.
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
+        # Set implicit wait time
+        driver.implicitly_wait(5)
+
         # Wait to load the page.
-        # Changing time to 3s to try and bypass script timeout on EC2
-        time.sleep(1.5)
+        time.sleep(1)
 
         # Calculate new scroll height and compare with last scroll height.
         new_height = driver.execute_script("return document.body.scrollHeight")
@@ -76,12 +78,13 @@ def update_games():
             break
         last_height = new_height
     i = 0
+    totalFinds = len(element.find_elements(By.CSS_SELECTOR, 'a'))
     for row in element.find_elements(By.CSS_SELECTOR, 'a'):
         inside_array = []
-        print("scrape row" + str(i))
+        print("Progress: "+"{0:.2%}".format(i/totalFinds))
+        # print("scrape row " + str(i/totalFinds))
         i = i + 1
         unique_id = np.int64(row.get_attribute('data-ds-appid'))
-        totalFinds = row.get_attribute('')
         # conditional to see if new game
         if unique_id not in unique_id_list:
         
@@ -89,7 +92,7 @@ def update_games():
         # if True:
             inside_array.append(row.get_attribute('data-ds-appid'))
             inside_array.append(row.get_attribute('href'))
-            inside_array.append(row.find_element(By.CLASS_NAME, 'title').get_attribute('innerHTML'))
+            inside_array.append(row.find_element(By.CLASS_NAME, 'title').get_attribute('innerHTML').replace(u"\u2122", '').replace(u"\u00ae", '').replace('&amp;','&'))
 
         temp = row.get_attribute('data-ds-tagids')
         if temp is not None:
