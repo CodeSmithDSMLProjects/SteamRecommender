@@ -1,0 +1,33 @@
+FROM python:3.8
+
+WORKDIR /src/app
+
+# COPY model.py /src/app
+
+# COPY functions.py /src/app
+
+# COPY server.py /src/app
+
+COPY streamlit.py /src/app
+
+COPY requirements.txt /src/app
+
+RUN pip install --upgrade pip
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    software-properties-common \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install -r requirements.txt
+
+EXPOSE 8501
+
+EXPOSE 80
+
+CMD ["streamlit", "run", "streamlit.py", "--server.port=80", "--server.address=0.0.0.0"]
+
+
+

@@ -1,0 +1,24 @@
+FROM python:3.8
+
+WORKDIR /app
+
+COPY model.py .
+
+COPY functions.py .
+
+COPY server.py .
+
+COPY streamlit.py .
+
+COPY requirements.txt .
+
+RUN pip install --upgrade pip
+
+RUN pip install -r requirements.txt
+
+ENV FLASK_APP="server"
+
+EXPOSE 8080/TCP
+
+CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=8080"]
+
