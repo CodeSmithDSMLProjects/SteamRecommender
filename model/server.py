@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 import boto3
 import pickle as pkl
 import os
-from functions import load_file, topGames
+from functions import topGames
 
 # df = pd.read_csv('../data/steam.csv')
 # idDict = df.set_index('title').to_dict()['Unique_ID']
@@ -48,16 +48,19 @@ SELECT * FROM steam
 df = pd.read_sql(sql, con=connection)
 idDict = df.set_index('title').to_dict()['Unique_ID']
 
-
 app = Flask(__name__)
 
 @app.route('/')
-
+def index():
+    return 'Web App with Python Flask!'
 
 @app.route('/predict_streamlit', methods = ['POST'])
 def predict_streamlit():
 
     data = request.json
+    # print(str(type(idDict[data[1:-1]])))
+    # return str(type(idDict[data[1:-1]]))
+
     pred = topGames(idDict[data[1:-1]], unpickled, 10)
     res = pred.to_json()
     load = json.loads(res)
