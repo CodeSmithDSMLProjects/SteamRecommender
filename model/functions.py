@@ -5,6 +5,7 @@ from botocore.exceptions import ClientError
 import pandas as pd
 from sqlalchemy import create_engine, URL
 import os
+import logging
 
 # Read pkl file from S3
 def load_file(file_name, bucket):
@@ -82,9 +83,9 @@ def topGames(id, df, max=10):
     # Read from within dockerfile
     # Substitute for sql datatable
     # data = pd.read_csv('steam.csv')
-    data = connectSteam('steam')
+    # data = connectSteam('steam')
 
-    # data = pd.read_csv('../data/steam.csv')
+    data = connectSteam('steam')
     idNamesDict = data.set_index('Unique_ID').to_dict()['title']
 
     # Get top matches

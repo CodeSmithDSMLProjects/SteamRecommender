@@ -32,7 +32,9 @@ df = pd.read_sql(sql, con=connection)
 
 selected_navbar = option_menu(None, ["Predict", "FAQ", "API"], orientation="horizontal")
 
-url     =  'http://0.0.0.0:8080/predict_streamlit'
+# url = os.environ["SERVER_URL"]
+url     =  'http://server_docker:8080/predict_streamlit'
+
 
 if selected_navbar == "Predict":
     with st.container():
@@ -74,7 +76,6 @@ if selected_navbar == "FAQ":
             st.write('All of the data has been gathered through web scraping steams database of top selling games')
         with st.expander("Can I use this site commercially?"):
             st.write('This site is not intended to be used commercially and should not be used commercially')
-
 
 
 st.write("Developed by Kevin Lam and Paul Yim [Github Repo]('https://github.com/CodeSmithDSMLProjects/SteamRecommender')")

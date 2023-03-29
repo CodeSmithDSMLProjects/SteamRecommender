@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 
 import pandas as pd
 
+
 service = Service('/users/paulj/chromedriver')
 driver = webdriver.Chrome(service=service)
 driver.get("https://steamdb.info/tags/")

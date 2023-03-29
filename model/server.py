@@ -21,7 +21,7 @@ session = boto3.Session(
 
 s3client = session.client('s3')
 
-bucket = 'steamcos'
+bucket = 'steam-models'
 file_name = 'cos_df.pkl'
 
 response = s3client.get_object(Bucket=bucket, Key=file_name)
