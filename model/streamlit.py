@@ -32,8 +32,8 @@ df = pd.read_sql(sql, con=connection)
 
 selected_navbar = option_menu(None, ["Predict", "FAQ", "API"], orientation="horizontal")
 
-# url = os.environ["SERVER_URL"]
-url     =  'http://server_docker:8080/predict_streamlit'
+url = os.environ["SERVER_URL"]
+# url     =  'http://server_docker:8080/predict_streamlit'
 
 
 if selected_navbar == "Predict":
